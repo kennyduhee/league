@@ -54,39 +54,7 @@
     }
 
     .group-tabs {
-      display: flex;
-      gap: 8px;
-      padding: 12px 16px;
-      overflow-x: auto;
-      scrollbar-width: none;
-      background: var(--bg-header);
-      border-bottom: 1px solid var(--border);
-      position: sticky;
-      top: 62px;
-      z-index: 99;
-    }
-
-    .group-tabs::-webkit-scrollbar {
       display: none;
-    }
-
-    .group-tab {
-      flex-shrink: 0;
-      padding: 8px 16px;
-      border-radius: 20px;
-      border: 1px solid var(--border);
-      background: transparent;
-      color: var(--text-secondary);
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .group-tab.active {
-      background: var(--naver-green);
-      border-color: var(--naver-green);
-      color: #fff;
     }
 
     .content {
@@ -94,10 +62,6 @@
     }
 
     .group-panel {
-      display: none;
-    }
-
-    .group-panel.active {
       display: block;
     }
 
@@ -381,7 +345,59 @@
       }).join("");
     }
 
-    renderTabs();
+    function renderContent() {
+      const content = document.getElementById("content");
+      content.innerHTML = GROUPS.map((g) => {
+        const rows = STANDINGS[g];
+        const teamCount = rows.length;
+        const maxPlayed = Math.max(...rows.map((r) => r.played));
+
+        return `
+          <section class="group-panel" id="panel-${g}">
+            <div class="group-info">
+              <span class="group-name">${g}조</span>
+              <span class="group-meta">${teamCount}팀 · ${maxPlayed}경기 진행</span>
+            </div>
+            <div class="legend">
+              <span class="legend-item"><span class="legend-dot"></span> 상위권</span>
+            </div>
+            <table class="standings-table">
+              <thead>
+                <tr>
+                  <th>순위</th>
+                  <th>팀</th>
+                  <th>경기</th>
+                  <th>승</th>
+                  <th>무</th>
+                  <th>패</th>
+                  <th>득</th>
+                  <th>실</th>
+                  <th>득실</th>
+                  <th>승점</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${rows.map((r) => `
+                  <tr class="${r.rank <= 2 ? "top-rank" : ""}">
+                    <td>${r.rank}</td>
+                    <td>${r.team}</td>
+                    <td>${r.played}</td>
+                    <td>${r.won}</td>
+                    <td>${r.drawn}</td>
+                    <td>${r.lost}</td>
+                    <td>${r.gf}</td>
+                    <td>${r.ga}</td>
+                    <td>${formatGd(r.gd)}</td>
+                    <td class="pts">${r.pts}</td>
+                  </tr>
+                `).join("")}
+              </tbody>
+            </table>
+          </section>
+        `;
+      }).join("");
+    }
+
     renderContent();
   </script>
 </body>
